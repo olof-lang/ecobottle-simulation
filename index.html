@@ -1,0 +1,269 @@
+<!-- ... existing code ... -->
+                        <div class="grid grid-cols-1 md:grid-cols-2 gap-x-6 gap-y-3 text-xs">
+                            <!-- Shrimps Count -->
+                            <div class="space-y-1">
+                                <div class="flex justify-between items-center font-medium">
+                                    <label class="text-slate-300 flex items-center gap-1.5">
+                                        <i data-lucide="bug" class="w-3.5 h-3.5 text-rose-400"></i> Shrimp Count
+                                    </label>
+                                    <div class="flex items-center gap-1">
+                                        <button onclick="adjustValue('input-shrimps', -1)" class="w-6 h-6 rounded bg-slate-800 hover:bg-slate-700 border border-slate-700 text-slate-300 flex items-center justify-center font-bold text-xs">-</button>
+                                        <input type="number" id="num-shrimps" min="0" max="30" value="4" class="w-12 bg-slate-900 border border-slate-700 rounded text-center text-sky-400 font-mono py-0.5 text-xs focus:outline-none focus:border-sky-500">
+                                        <button onclick="adjustValue('input-shrimps', 1)" class="w-6 h-6 rounded bg-slate-800 hover:bg-slate-700 border border-slate-700 text-slate-300 flex items-center justify-center font-bold text-xs">+</button>
+                                    </div>
+                                </div>
+                                <input type="range" id="input-shrimps" min="0" max="30" step="1" value="4">
+                            </div>
+
+                            <!-- Plant Mass -->
+                            <div class="space-y-1">
+                                <div class="flex justify-between items-center font-medium">
+                                    <label class="text-slate-300 flex items-center gap-1.5">
+                                        <i data-lucide="leaf" class="w-3.5 h-3.5 text-emerald-400"></i> Plant Mass (grams)
+                                    </label>
+                                    <div class="flex items-center gap-1">
+                                        <button onclick="adjustValue('input-plants', -1)" class="w-6 h-6 rounded bg-slate-800 hover:bg-slate-700 border border-slate-700 text-slate-300 flex items-center justify-center font-bold text-xs">-</button>
+                                        <div class="relative flex items-center">
+                                            <input type="number" id="num-plants" min="1" max="60" value="12" class="w-14 bg-slate-900 border border-slate-700 rounded text-center text-emerald-400 font-mono py-0.5 text-xs pr-3 focus:outline-none focus:border-emerald-500">
+                                            <span class="absolute right-1 text-[10px] text-slate-500 font-mono">g</span>
+                                        </div>
+                                        <button onclick="adjustValue('input-plants', 1)" class="w-6 h-6 rounded bg-slate-800 hover:bg-slate-700 border border-slate-700 text-slate-300 flex items-center justify-center font-bold text-xs">+</button>
+                                    </div>
+                                </div>
+                                <input type="range" id="input-plants" min="1" max="60" step="1" value="12">
+                            </div>
+
+                            <!-- Water Volume -->
+                            <div class="space-y-1">
+<!-- ... existing code ... -->
+            // Draw Microalgae Film on Substrate
+            ctx.fillStyle = `rgba(34, 197, 94, ${Math.min(0.8, state.biofilmMass / 60)})`;
+            ctx.fillRect(w * 0.18, h * 0.8, w * 0.64, 4);
+
+            // 4. Draw Aquatic Plants (Anacharis / Java Moss stems based directly on plantMass)
+            const plantCount = Math.min(16, Math.max(1, Math.floor(state.plantMass / 2.5)));
+            ctx.lineWidth = Math.min(4, 2 + state.plantMass / 20);
+            ctx.strokeStyle = state.plantHealth > 50 ? "#22c55e" : "#84cc16";
+
+            for (let p = 0; p < plantCount; p++) {
+                const px = w * 0.22 + p * (w * 0.56 / Math.max(1, plantCount - 1));
+                const plantHeight = Math.min(h * 0.55, h * 0.25 + (state.plantMass * 2.5) + Math.sin(p * 2.5) * 15);
+
+                ctx.beginPath();
+                ctx.moveTo(px, h * 0.81);
+                // Curved stem swaying gently
+                const sway = Math.sin(Date.now() * 0.002 + p * 0.8) * 6;
+                ctx.quadraticCurveTo(px + sway, h * 0.6, px + sway * 1.5, h * 0.81 - plantHeight);
+                ctx.stroke();
+
+                // Plant Leaves Density proportional to Plant Mass
+                ctx.fillStyle = state.plantHealth > 50 ? "#16a34a" : "#65a30d";
+                const leafPairs = Math.min(10, Math.max(3, Math.floor(plantHeight / 15)));
+                for (let l = 0; l < leafPairs; l++) {
+                    const ly = h * 0.8 - (l * (plantHeight / leafPairs));
+                    const lx = px + (sway * (l / leafPairs));
+                    ctx.beginPath();
+                    ctx.ellipse(lx - 5, ly, 6, 2.5, Math.PI / 4, 0, Math.PI * 2);
+                    ctx.ellipse(lx + 5, ly, 6, 2.5, -Math.PI / 4, 0, Math.PI * 2);
+                    ctx.fill();
+                }
+
+                // Photosynthesis Oxygen Bubbles Generation (During Day)
+<!-- ... existing code ... -->
+        // --- EVENT LISTENERS & CONTROLS ---
+        function setupEventListeners() {
+            // Play / Pause Toggle
+            const btnPlay = document.getElementById("btn-play");
+            const playIcon = document.getElementById("play-icon");
+            const playText = document.getElementById("play-text");
+
+            btnPlay.addEventListener("click", () => {
+                state.isRunning = !state.isRunning;
+                if (state.isRunning) {
+                    btnPlay.className = "p-2 rounded-lg bg-amber-600 hover:bg-amber-500 text-white transition font-medium flex items-center space-x-1 text-xs";
+                    playIcon.setAttribute("data-lucide", "pause");
+                    playText.innerText = "Pause";
+                } else {
+                    btnPlay.className = "p-2 rounded-lg bg-emerald-600 hover:bg-emerald-500 text-white transition font-medium flex items-center space-x-1 text-xs";
+                    playIcon.setAttribute("data-lucide", "play");
+                    playText.innerText = "Start";
+                }
+                lucide.createIcons();
+            });
+
+            // Speed Selector Buttons
+            document.querySelectorAll(".speed-btn").forEach(btn => {
+                btn.addEventListener("click", (e) => {
+                    document.querySelectorAll(".speed-btn").forEach(b => {
+                        b.className = "speed-btn px-2.5 py-1 text-xs font-mono rounded-lg text-slate-400 hover:bg-slate-800";
+                    });
+                    e.target.className = "speed-btn px-2.5 py-1 text-xs font-mono rounded-lg text-slate-300 hover:bg-slate-800 bg-slate-800/80 border border-slate-700";
+                    state.speed = parseInt(e.target.dataset.speed);
+                });
+            });
+
+            // Reset Button
+            document.getElementById("btn-reset").addEventListener("click", () => {
+                resetSimulation();
+            });
+
+            // Interactive Canvas Click to Add Shrimps
+            const canvas = document.getElementById("ecoCanvas");
+            if (canvas) {
+                canvas.addEventListener("click", (e) => {
+                    const rect = canvas.getBoundingClientRect();
+                    const x = (e.clientX - rect.left) * (canvas.width / rect.width);
+                    const y = (e.clientY - rect.top) * (canvas.height / rect.height);
+                    
+                    // Add new shrimp at clicked position
+                    const newCount = state.shrimps.length + 1;
+                    if (newCount <= 30) {
+                        state.shrimps.push(new Shrimp(newCount - 1, x, y));
+                        state.shrimpCount = newCount;
+                        syncControlValues('shrimpCount', newCount);
+                    }
+                });
+            }
+
+            // Sync Sliders and Number Inputs
+            bindControl("input-shrimps", "num-shrimps", "shrimpCount", val => {
+                initShrimps(val);
+            });
+
+            bindControl("input-plants", "num-plants", "plantMass");
+
+            const bindSlider = (id, targetProp, displayId, unit = '', transform = v => v) => {
+                const slider = document.getElementById(id);
+                if (!slider) return;
+                slider.addEventListener("input", (e) => {
+                    const val = parseFloat(e.target.value);
+                    state[targetProp] = transform(val);
+                    const display = document.getElementById(displayId);
+                    if (display) display.innerText = `${val} ${unit}`;
+                });
+            };
+
+            bindSlider("input-volume", "waterVolume", "val-volume", "L");
+            bindSlider("input-light", "photoperiod", "val-light", "hrs");
+            bindSlider("input-intensity", "lightIntensity", "val-intensity", "%");
+            bindSlider("input-waste", "initialWaste", "val-waste", "mg", v => v);
+        }
+
+        // Helper to bind range slider with numeric input field
+        function bindControl(sliderId, numId, stateProp, onChangeCallback) {
+            const slider = document.getElementById(sliderId);
+            const num = document.getElementById(numId);
+
+            if (!slider || !num) return;
+
+            const updateValue = (val) => {
+                const min = parseFloat(slider.min);
+                const max = parseFloat(slider.max);
+                const clamped = Math.max(min, Math.min(max, parseFloat(val) || min));
+
+                slider.value = clamped;
+                num.value = clamped;
+                state[stateProp] = clamped;
+
+                if (onChangeCallback) onChangeCallback(clamped);
+            };
+
+            slider.addEventListener("input", (e) => updateValue(e.target.value));
+            num.addEventListener("change", (e) => updateValue(e.target.value));
+        }
+
+        // Helper for +/- buttons
+        function adjustValue(sliderId, delta) {
+            const slider = document.getElementById(sliderId);
+            if (!slider) return;
+            const newVal = parseFloat(slider.value) + delta;
+            slider.value = newVal;
+            slider.dispatchEvent(new Event('input'));
+        }
+
+        function syncControlValues(prop, value) {
+            if (prop === 'shrimpCount') {
+                const slider = document.getElementById("input-shrimps");
+                const num = document.getElementById("num-shrimps");
+                if (slider) slider.value = value;
+                if (num) num.value = value;
+            } else if (prop === 'plantMass') {
+                const slider = document.getElementById("input-plants");
+                const num = document.getElementById("num-plants");
+                if (slider) slider.value = value;
+                if (num) num.value = value;
+            }
+        }
+
+        // Reset state back to initial slider values
+        function resetSimulation() {
+            state.timeHours = 8;
+            state.dayCount = 1;
+            state.o2 = 8.2;
+            state.co2 = 5.4;
+            state.nh3 = 0.02;
+            state.no2 = 0.01;
+            state.no3 = 12.5;
+            state.ph = 7.35;
+            state.biofilmMass = 45.0;
+            state.shrimpHealth = 100;
+            state.plantHealth = 100;
+
+            state.shrimpCount = parseInt(document.getElementById("input-shrimps").value);
+            state.plantMass = parseFloat(document.getElementById("input-plants").value);
+            state.waterVolume = parseFloat(document.getElementById("input-volume").value);
+            state.photoperiod = parseInt(document.getElementById("input-light").value);
+            state.lightIntensity = parseInt(document.getElementById("input-intensity").value);
+            state.initialWaste = parseFloat(document.getElementById("input-waste").value);
+
+            initShrimps(state.shrimpCount);
+
+            state.history = {
+                labels: [],
+                o2: [],
+                co2: [],
+                nh3: [],
+                no2: [],
+                no3: [],
+                shrimpCount: [],
+                plantMass: [],
+                biofilmMass: [],
+                ph: []
+            };
+
+            updateUI();
+            updateCharts();
+        }
+
+        // --- PRESET SCENARIO LOADER ---
+        function loadPreset(type) {
+            // Switch back to simulation tab
+            switchTab('sim');
+
+            if (type === 'perfect') {
+                setSliderValues(4, 12, 1.5, 12, 75, 2);
+            } else if (type === 'overcrowded') {
+                setSliderValues(12, 4, 1.0, 10, 60, 5);
+            } else if (type === 'darkness') {
+                setSliderValues(5, 15, 1.5, 0, 0, 2);
+            } else if (type === 'bloom') {
+                setSliderValues(2, 8, 1.5, 24, 100, 15);
+            }
+
+            resetSimulation();
+        }
+
+        function setSliderValues(shrimps, plants, volume, light, intensity, waste) {
+            syncControlValues('shrimpCount', shrimps);
+            syncControlValues('plantMass', plants);
+            
+            document.getElementById("input-volume").value = volume;
+            document.getElementById("val-volume").innerText = volume + " L";
+            document.getElementById("input-light").value = light;
+            document.getElementById("val-light").innerText = light + " hrs";
+            document.getElementById("input-intensity").value = intensity;
+            document.getElementById("val-intensity").innerText = intensity + " %";
+            document.getElementById("input-waste").value = waste;
+            document.getElementById("val-waste").innerText = waste + " mg";
+        }
+<!-- ... existing code ... -->
